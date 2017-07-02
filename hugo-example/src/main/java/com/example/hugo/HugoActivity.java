@@ -16,7 +16,7 @@ public class HugoActivity extends Activity {
 
     printArgs("The", "Quick", "Brown", "Fox");
 
-    Log.i("Fibonacci", "fibonacci's 4th number is " + fibonacci(4));
+    Log.i("Fibonacci", "fibonacci's 4th number is " + fibonacci(7));
 
     Greeter greeter = new Greeter("Jake");
     Log.d("Greeting", greeter.sayHello());
@@ -28,14 +28,14 @@ public class HugoActivity extends Activity {
     startSleepyThread();
   }
 
-  @DebugLog(exclude = true)
+  @DebugLog(exclude = false, level = DebugLog.ERROR)
   private void printArgs(String... args) {
     for (String arg : args) {
       Log.i("Args", arg);
     }
   }
 
-  @DebugLog
+  @DebugLog(levelDuration = {3, 2, 1})
   private int fibonacci(int number) {
     if (number <= 0) {
       throw new IllegalArgumentException("Number must be greater than zero.");

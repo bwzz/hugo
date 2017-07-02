@@ -59,7 +59,8 @@ public class Hugo {
   private static void enterMethod(JoinPoint joinPoint) {
     if (!enabled) return;
 
-    if (isExclude(joinPoint)) {
+    LogConfig logConfig = parseLogConfig(joinPoint);
+    if (logConfig.isExclude()) {
       return;
     }
 
@@ -85,7 +86,7 @@ public class Hugo {
       builder.append(" [Thread:\"").append(Thread.currentThread().getName()).append("\"]");
     }
 
-    Log.v(asTag(cls), builder.toString());
+    log(logConfig, asTag(cls), builder.toString(), 0);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
       final String section = builder.toString().substring(2);
@@ -96,7 +97,8 @@ public class Hugo {
   private static void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
     if (!enabled) return;
 
-    if (isExclude(joinPoint)) {
+    LogConfig logConfig = parseLogConfig(joinPoint);
+    if (logConfig.isExclude()) {
       return;
     }
 
@@ -122,7 +124,7 @@ public class Hugo {
       builder.append(Strings.toString(result));
     }
 
-    Log.v(asTag(cls), builder.toString());
+    log(logConfig, asTag(cls), builder.toString(), lengthMillis);
   }
 
   private static String asTag(Class<?> cls) {
@@ -132,29 +134,57 @@ public class Hugo {
     return cls.getSimpleName();
   }
 
-  private static boolean isExclude(JoinPoint joinPoint) {
+  private static LogConfig parseLogConfig(JoinPoint joinPoint) {
+    LogConfig logConfig = new LogConfig();
     Signature signature = joinPoint.getSignature();
-    if (!(signature instanceof MethodSignature)) {
-      return isExcludeClass(signature);
+    DebugLog debugLog = null;
+    if (signature instanceof MethodSignature) {
+      Method method = ((MethodSignature) signature).getMethod();
+      if (method != null) {
+        debugLog = method.getAnnotation(DebugLog.class);
+      }
     }
-    Method method = ((MethodSignature) signature).getMethod();
-    if (method == null) {
-      return isExcludeClass(signature);
-    }
-    DebugLog debugLog = method.getAnnotation(DebugLog.class);
     if (debugLog == null) {
-      return isExcludeClass(signature);
-    } else {
-      return debugLog.exclude();
+      Class<?> cls = signature.getDeclaringType();
+      debugLog = cls.getAnnotation(DebugLog.class);
     }
+    if (debugLog == null) {
+      return logConfig;
+    }
+    logConfig.setExclude(debugLog.exclude());
+    logConfig.setLogLevel(debugLog.level());
+    logConfig.setLevelDuration(debugLog.levelDuration());
+    return logConfig;
   }
 
-  private static boolean isExcludeClass(Signature signature) {
-    Class<?> cls = signature.getDeclaringType();
-    DebugLog debugLog = cls.getAnnotation(DebugLog.class);
-    if (debugLog == null) {
-      return false;
+  private static void log(LogConfig logConfig, String tag, String log, long duration) {
+    int level;
+    if (logConfig.getLogLevel() != DebugLog.DEFAULT) {
+      level = logConfig.getLogLevel();
+    } else {
+      level = logConfig.getLogLevelByDuration(duration);
+      if (level < DebugLog.VERBOSE) {
+        level = DebugLog.VERBOSE;
+      }
     }
-    return debugLog.exclude();
+    switch (level) {
+      case DebugLog.DEBUG:
+        Log.d(tag, log);
+        break;
+      case DebugLog.ERROR:
+        Log.e(tag, log);
+        break;
+      case DebugLog.INFO:
+        Log.i(tag, log);
+        break;
+      case DebugLog.VERBOSE:
+        Log.v(tag, log);
+        break;
+      case DebugLog.WARN:
+        Log.w(tag, log);
+        break;
+      default:
+        Log.e(tag, log);
+    }
   }
 }
