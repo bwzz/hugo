@@ -20,6 +20,7 @@ public class HugoActivity extends Activity {
 
     Greeter greeter = new Greeter("Jake");
     Log.d("Greeting", greeter.sayHello());
+    Log.d("Greeting", greeter.sayHello2());
 
     Charmer charmer = new Charmer("Jake");
     Log.d("Charming", charmer.askHowAreYou());
@@ -27,7 +28,7 @@ public class HugoActivity extends Activity {
     startSleepyThread();
   }
 
-  @DebugLog
+  @DebugLog(exclude = true)
   private void printArgs(String... args) {
     for (String arg : args) {
       Log.i("Args", arg);
@@ -61,7 +62,7 @@ public class HugoActivity extends Activity {
     }, "I'm a lazy thr.. bah! whatever!").start();
   }
 
-  @DebugLog
+  @DebugLog(exclude = true)
   static class Greeter {
     private final String name;
 
@@ -71,6 +72,11 @@ public class HugoActivity extends Activity {
 
     private String sayHello() {
       return "Hello, " + name;
+    }
+
+    @DebugLog
+    private String sayHello2() {
+      return "Hello2, " + name;
     }
   }
 

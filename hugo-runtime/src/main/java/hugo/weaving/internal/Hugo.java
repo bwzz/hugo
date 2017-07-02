@@ -14,7 +14,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
+
+import hugo.weaving.DebugLog;
 
 @Aspect
 public class Hugo {
@@ -56,6 +59,10 @@ public class Hugo {
   private static void enterMethod(JoinPoint joinPoint) {
     if (!enabled) return;
 
+    if (isExclude(joinPoint)) {
+      return;
+    }
+
     CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
 
     Class<?> cls = codeSignature.getDeclaringType();
@@ -89,6 +96,10 @@ public class Hugo {
   private static void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
     if (!enabled) return;
 
+    if (isExclude(joinPoint)) {
+      return;
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
       Trace.endSection();
     }
@@ -119,5 +130,31 @@ public class Hugo {
       return asTag(cls.getEnclosingClass());
     }
     return cls.getSimpleName();
+  }
+
+  private static boolean isExclude(JoinPoint joinPoint) {
+    Signature signature = joinPoint.getSignature();
+    if (!(signature instanceof MethodSignature)) {
+      return isExcludeClass(signature);
+    }
+    Method method = ((MethodSignature) signature).getMethod();
+    if (method == null) {
+      return isExcludeClass(signature);
+    }
+    DebugLog debugLog = method.getAnnotation(DebugLog.class);
+    if (debugLog == null) {
+      return isExcludeClass(signature);
+    } else {
+      return debugLog.exclude();
+    }
+  }
+
+  private static boolean isExcludeClass(Signature signature) {
+    Class<?> cls = signature.getDeclaringType();
+    DebugLog debugLog = cls.getAnnotation(DebugLog.class);
+    if (debugLog == null) {
+      return false;
+    }
+    return debugLog.exclude();
   }
 }
