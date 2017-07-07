@@ -14,6 +14,8 @@ public class Hugo {
 
   static volatile LogConfig logConfig = new LogConfig();
 
+  static HugoPin hugoPin = new HugoPin();
+
   @Pointcut("within(@hugo.weaving.DebugLog *)")
   public void withinAnnotatedClass() {}
 
@@ -35,6 +37,10 @@ public class Hugo {
 
   public static void setHugoCallback(HugoCallback hugoCallback) {
     Hugo.hugoCallback = hugoCallback;
+  }
+
+  public static void pin(String pin) {
+    Hugo.hugoPin.pin(pin);
   }
 
   @Around("method() || constructor()")

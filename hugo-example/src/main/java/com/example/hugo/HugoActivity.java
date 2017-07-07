@@ -7,20 +7,24 @@ import android.util.Log;
 import android.widget.TextView;
 
 import hugo.weaving.DebugLog;
+import hugo.weaving.internal.Hugo;
 
 @DebugLog(onlyMainThread = DebugLog.TRUE)
 public class HugoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Hugo.pin("super.OnCreate");
         super.onCreate(savedInstanceState);
         TextView tv = new TextView(this);
         tv.setText("Check logcat!");
+        Hugo.pin("setContentView");
         setContentView(tv);
 
         printArgs("The", "Quick", "Brown", "Fox");
 
+        Hugo.pin("fibonacci 7");
         Log.i("Fibonacci", "fibonacci's 4th number is " + fibonacci(7));
-
+        Hugo.pin("new Greeter(\"Jake\")");
         Greeter greeter = new Greeter("Jake");
         Log.d("Greeting", greeter.sayHello());
         Log.d("Greeting", greeter.sayHello2());
@@ -38,7 +42,7 @@ public class HugoActivity extends Activity {
         }
     }
 
-    @DebugLog(levelDuration = {3, 2, 1}, onlyMainThread = DebugLog.FALSE)
+    @DebugLog(onlyMainThread = DebugLog.FALSE)
     private int fibonacci(int number) {
         if (number <= 0) {
             throw new IllegalArgumentException("Number must be greater than zero.");
@@ -56,9 +60,13 @@ public class HugoActivity extends Activity {
 
             @Override
             public void run() {
+                Hugo.pin("run");
                 sleepyMethod(SOME_POINTLESS_AMOUNT_OF_TIME);
+                Hugo.pin("sleepyMethod");
                 sleepyMethodLogOnChildThread(SOME_POINTLESS_AMOUNT_OF_TIME);
+                Hugo.pin("sleepyMethodLogOnChildThread");
                 fibonacci(9);
+                Hugo.pin("fibonacci 9");
             }
 
             @DebugLog(onlyMainThread = DebugLog.TRUE)
