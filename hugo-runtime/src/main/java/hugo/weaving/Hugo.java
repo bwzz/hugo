@@ -1,4 +1,4 @@
-package hugo.weaving.internal;
+package hugo.weaving;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -8,28 +8,15 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import java.util.concurrent.TimeUnit;
 
-@Aspect
+import hugo.weaving.internal.HugoPin;
+import hugo.weaving.internal.HugoUtil;
+
 public class Hugo {
   private static volatile HugoCallback hugoCallback = new HugoCallback.DefaultHugoCallback();
 
-  static volatile LogConfig logConfig = new LogConfig();
+  public static volatile LogConfig logConfig = new LogConfig();
 
   static HugoPin hugoPin = new HugoPin();
-
-  @Pointcut("within(@hugo.weaving.DebugLog *)")
-  public void withinAnnotatedClass() {}
-
-  @Pointcut("execution(!synthetic * *(..)) && withinAnnotatedClass()")
-  public void methodInsideAnnotatedType() {}
-
-  @Pointcut("execution(!synthetic *.new(..)) && withinAnnotatedClass()")
-  public void constructorInsideAnnotatedType() {}
-
-  @Pointcut("execution(@hugo.weaving.DebugLog * *(..)) || methodInsideAnnotatedType()")
-  public void method() {}
-
-  @Pointcut("execution(@hugo.weaving.DebugLog *.new(..)) || constructorInsideAnnotatedType()")
-  public void constructor() {}
 
   public static void setLogConfig(LogConfig logConfig) {
     Hugo.logConfig = logConfig;
@@ -43,8 +30,7 @@ public class Hugo {
     Hugo.hugoPin.pin(pin);
   }
 
-  @Around("method() || constructor()")
-  public Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
+  public static Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
     LogConfig logConfig = HugoUtil.parseLogConfig(joinPoint);
     enterMethod(joinPoint, logConfig);
 

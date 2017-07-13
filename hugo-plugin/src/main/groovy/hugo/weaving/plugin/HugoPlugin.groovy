@@ -26,20 +26,27 @@ class HugoPlugin implements Plugin<Project> {
     }
 
     project.dependencies {
-      debugCompile 'com.jakewharton.hugo:hugo-runtime:1.2.2-SNAPSHOT'
       // TODO this should come transitively
       debugCompile 'org.aspectj:aspectjrt:1.8.6'
-      compile 'com.jakewharton.hugo:hugo-annotations:1.2.2-SNAPSHOT'
+      compile 'com.jakewharton.hugo:hugo-runtime:1.2.2'
     }
 
-    project.extensions.create('hugo', HugoExtension)
+    def hugoEnabled = Boolean.parseBoolean(project.hasProperty("hugo.enabled") ? project.property("hugo.enabled") : "false")
+
+    log.error("Hugo enabled : " + hugoEnabled)
+    if (!hugoEnabled) {
+      return;
+    }
+    project.dependencies {
+      debugCompile 'com.jakewharton.hugo:hugo-aspectj:1.2.2'
+    }
 
     variants.all { variant ->
       if (!variant.buildType.isDebuggable()) {
         log.debug("Skipping non-debuggable build type '${variant.buildType.name}'.")
         return;
-      } else if (!project.hugo.enabled) {
-        log.debug("Hugo is not disabled.")
+      } else if (!hugoEnabled) {
+        log.debug("Hugo is disabled.")
         return;
       }
 

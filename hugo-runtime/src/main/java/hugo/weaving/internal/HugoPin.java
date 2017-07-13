@@ -4,17 +4,19 @@ import android.os.Looper;
 
 import java.util.concurrent.TimeUnit;
 
+import hugo.weaving.Hugo;
+
 /**
  * Created by wanghb on 17/7/7.
  */
 
-class HugoPin {
+public class HugoPin {
 
     private ThreadLocal<Long> lastNanoTime = new ThreadLocal<>();
 
     private ThreadLocal<Integer> counter = new ThreadLocal<>();
 
-    void pin(String pin) {
+    public void pin(String pin) {
         StringBuilder stringBuilder = new StringBuilder("\u23F0 : ");
         long duration = Long.MAX_VALUE;
         if (lastNanoTime.get() == null) {

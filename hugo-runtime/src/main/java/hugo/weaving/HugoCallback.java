@@ -1,18 +1,14 @@
-package hugo.weaving.internal;
+package hugo.weaving;
 
 import android.os.Build;
 import android.os.Looper;
 import android.os.Trace;
-import android.util.Log;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.CodeSignature;
-import org.aspectj.lang.reflect.MethodSignature;
 
-import java.lang.reflect.Method;
-
-import hugo.weaving.DebugLog;
+import hugo.weaving.internal.HugoUtil;
 
 /**
  * Created by wanghb on 17/7/3.

@@ -1,4 +1,4 @@
-include ':hugo-annotations'
+include ':hugo-aspectj'
 include ':hugo-plugin'
 include ':hugo-runtime'
 include ':hugo-example'

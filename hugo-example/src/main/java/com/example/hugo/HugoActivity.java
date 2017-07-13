@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import hugo.weaving.DebugLog;
-import hugo.weaving.internal.Hugo;
+import hugo.weaving.Hugo;
 
 @DebugLog(onlyMainThread = DebugLog.TRUE)
 public class HugoActivity extends Activity {

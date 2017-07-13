@@ -11,6 +11,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import java.lang.reflect.Method;
 
 import hugo.weaving.DebugLog;
+import hugo.weaving.Hugo;
+import hugo.weaving.LogConfig;
 
 /**
  * Created by wanghb on 17/7/7.

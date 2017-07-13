@@ -1,6 +1,4 @@
-package hugo.weaving.internal;
-
-import hugo.weaving.DebugLog;
+package hugo.weaving;
 
 /**
  * Created by wanghb on 17/7/2.
@@ -71,7 +69,7 @@ public class LogConfig {
         this.enable = enable;
     }
 
-    LogConfig copy() {
+    public LogConfig copy() {
         LogConfig logConfig = new LogConfig();
         logConfig.setEnable(enable);
         logConfig.setLevelDuration(levelDuration);
